@@ -14,7 +14,7 @@ Commit - Sep 17, 2024 00:45
     Introduced ability to play against the computer.
 
 
-Commit - Sep 17, 2024 time
+Commit - Sep 17, 2024 01:20
     Changed the training function, preventing negative regrets and ensuring regretSum[j] is always non-negative. This fixed the skewed action profiles.
     Added README file.
     
