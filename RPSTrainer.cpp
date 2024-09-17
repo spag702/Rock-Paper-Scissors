@@ -101,23 +101,10 @@ void RPSTrainer::train(int iterations){
         actionUtility[oppAction] = 0;                         // Tie
         actionUtility[(oppAction + NUM_ACTIONS - 1) % NUM_ACTIONS] = -1; // Lose
 
-        /*   
-        if (oppAction == NUM_ACTIONS - 1){
-            actionUtility[0] = 1;
-        } else {
-            actionUtility[oppAction + 1] = 1;
-        }
-        
-        if (oppAction == 0){
-            actionUtility[NUM_ACTIONS - 1] = -1;
-        } else {
-            actionUtility[oppAction - 1] = -1;
-        }
-        */
         /* ---- accumulate action regrets ----*/
 
         for (int j = 0; j < NUM_ACTIONS; j++){
-            regretSum[j] += actionUtility[j] - actionUtility[myAction];
+            regretSum[j] = max(regretSum[j] + actionUtility[j] - actionUtility[myAction], 0.0);
         }
         
     }

@@ -35,6 +35,8 @@ public:
 
     // function to get mixed strat from "regret matching"
     vector<double> getStrat();
+
+    
 };
 
 #endif 

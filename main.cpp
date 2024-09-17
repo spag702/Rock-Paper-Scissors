@@ -6,7 +6,7 @@ int main() {
     // create an instance of the class
     RPSTrainer trainer;
 
-    int iterations = 1000000; // Number of training iterations
+    int iterations = 500000; // Number of training iterations
 
     trainer.train(iterations);
 
@@ -53,6 +53,7 @@ int main() {
         } else {
             cout << "\nUh oh! Something went wrong!" << endl;
             cout << "Make sure input is ALL LOWERCASE and spelled correctly" << endl;
+            continue;
         }
         
         // have algorithm select computer play
