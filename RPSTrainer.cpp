@@ -45,8 +45,6 @@ vector<double> RPSTrainer::getStrat() {
             // in the case of non-positive sum, give actions equal probability
             strat[i] = 1.0 / NUM_ACTIONS;
         }
-        
-        stratSum[i] += strat[i];
     }
     
     return strat;
@@ -85,7 +83,7 @@ void RPSTrainer::train(int iterations){
         /* ---- get actions ---- */
 
         // first compute current strategy
-        strat = getStrat();
+        strat = getTrainingStrat();
         // use to select actions
         int myAction = getAction(strat);
         int oppAction = getAction(oppStrat);
@@ -106,9 +104,7 @@ void RPSTrainer::train(int iterations){
         for (int j = 0; j < NUM_ACTIONS; j++){
             regretSum[j] = max(regretSum[j] + actionUtility[j] - actionUtility[myAction], 0.0);
         }
-        
     }
-    
 }
 
 vector<double> RPSTrainer::getAvgStrategy() {
@@ -128,4 +124,58 @@ vector<double> RPSTrainer::getAvgStrategy() {
     }
     
     return avgStrategy;
+}
+
+// during training, need to accumulate average strategy
+vector<double> RPSTrainer::getTrainingStrat() {
+    // sum of all positive regrets
+    double normalizingSum = 0;
+
+    // copy all positive regrets to 'strat' then sum them
+    for (int i = 0; i < NUM_ACTIONS; i++){
+        
+        if (regretSum[i] > 0){
+            strat[i] = regretSum[i];
+        } else {
+            strat[i] = 0;
+        }
+        
+        normalizingSum += strat[i];
+    }
+
+    // now we normalize these regrets (so that arrays sum to 1, representing probabilites)
+    for (int i = 0; i < NUM_ACTIONS; i++){
+
+        // if at least one action w/ positive regret
+        if (normalizingSum > 0){
+            // divide by normalizing sum
+            strat[i] /= normalizingSum;
+        } else {
+            // in the case of non-positive sum, give actions equal probability
+            strat[i] = 1.0 / NUM_ACTIONS;
+        }
+
+        // here we only update stratSum during training
+        stratSum[i] += strat[i];
+    }
+    
+    return strat;
+}
+
+void RPSTrainer::updateRegret(int myAction, int oppAction){
+    // vector containing the expected payoff of each action, given opponent play
+    vector<double> actionUtility(NUM_ACTIONS, 0.0);
+
+    // compute action utilities based on the opponent's action
+    actionUtility[(oppAction + 1) % NUM_ACTIONS] = 50;    // Win
+    actionUtility[oppAction] = -25;                        // Tie
+    actionUtility[(oppAction + NUM_ACTIONS - 1) % NUM_ACTIONS] = -50; // Lose
+
+    // sum action regrets
+    for (int i = 0; i < NUM_ACTIONS; i++) {
+        regretSum[i] += actionUtility[i] - actionUtility[myAction];
+    }
+
+    // recompute strategy
+    getStrat();
 }

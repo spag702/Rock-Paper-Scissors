@@ -6,34 +6,39 @@ int main() {
     // create an instance of the class
     RPSTrainer trainer;
 
-    int iterations = 500000; // Number of training iterations
+    int iterations = 1000000; // Number of training iterations
 
     trainer.train(iterations);
 
-    vector<double> avgStrategy = trainer.getAvgStrategy();
+    vector<double> initialStrategy = trainer.getStrat();
 
     // Output the probabilities of choices
     cout << "\nAverage strategy after " << iterations << " iterations:" << endl;
-    cout << "Rock:     " << avgStrategy[0] << endl;
-    cout << "Paper:    " << avgStrategy[1] << endl;
-    cout << "Scissors: " << avgStrategy[2] << endl;
+    cout << "Rock:     " << initialStrategy[0] << endl;
+    cout << "Paper:    " << initialStrategy[1] << endl;
+    cout << "Scissors: " << initialStrategy[2] << endl;
 
     // now we have the computer play against the user
 
     // create array of action names
-    const vector<string> actionNames = {"rock", "paper", "scissors"};
+    const vector<string> actionNames = {"Rock", "Paper", "Scissors"};
 
     cout << "\nLet's play Rock-Paper-Scissors!" << endl;
     cout << "Enter your move <Rock|Paper|Scissors>. Type 'exit' to quit the game" << endl;
 
-    // now we take user input
     string userPlay = "";
     bool playing = true;
 
     // game loop to repeat play
     while (playing){
+        // get user input
         cout << "Your move: ";
         getline(cin, userPlay);
+
+        // convert user input to all lowercase
+        for (auto &c : userPlay){
+            c = tolower(c);
+        }
 
         // if user wants to exit game
         if (userPlay == "exit"){
@@ -57,7 +62,7 @@ int main() {
         }
         
         // have algorithm select computer play
-        int computerAction = trainer.getAction(avgStrategy);
+        int computerAction = trainer.getAction(trainer.strat);
 
         cout << "\nComputer plays: " << actionNames[computerAction] << endl;
 
@@ -70,7 +75,15 @@ int main() {
             cout << "You win!" << endl;
         }
 
+        // update regrets and strategy based on user action
+        trainer.updateRegret(computerAction, userAction);
+
         cout << endl;
+
+        cout << "Updated AI strategy:" << endl;
+        cout << "Rock:     " << trainer.strat[0] << endl;
+        cout << "Paper:    " << trainer.strat[1] << endl;
+        cout << "Scissors: " << trainer.strat[2] << endl << endl;
         
     }
 
